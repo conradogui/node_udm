@@ -1,0 +1,23 @@
+const express = require("express");
+const app = express();
+const port = 3000; //variável de ambiente
+
+const path = require('path')
+
+const basePtah = path.join(__dirname, 'templates')
+
+app.get("/users/:id", (req, res) => {
+  const id = req.params.id
+
+  //aqui eu faria a leitura da tabela users e registraria um usuario do banco por exemplo
+
+  res.sendFile(`${basePtah}/index.html`)
+});
+
+app.get("/", (req, res) => {
+  res.sendFile(`${basePtah}/index.html`)
+});
+
+app.listen(port, () => {
+  console.log(`App rodando na porta ${port}`);
+});
