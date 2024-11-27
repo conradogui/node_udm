@@ -1,0 +1,6 @@
+<h1>Produtos</h1>
+{{#each products}}
+  <h2>{{this.name}}</h2>
+  <p>{{this.category}}</p>
+  <a href="/products/{{this.id}}">ir para {{this.name}}</a>
+{{/each}}
