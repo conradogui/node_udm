@@ -1,9 +1,49 @@
 const Tought = require("../models/Tougth.js");
 const User = require("../models/User.js");
 
+const { Op } = require("sequelize");
+const { format } = require("date-fns");
+
 module.exports = class ToughtsController {
   static async showToughts(req, res) {
-    res.render("toughts/home");
+    let search = "";
+
+    if (req.query.search) {
+      search = req.query.search;
+    }
+
+    let order = "DESC";
+
+    if (req.query.order === "old") {
+      order = "ASC";
+    } else {
+      order = "DESC";
+    }
+
+    const toughtsData = await Tought.findAll({
+      include: User,
+      where: {
+        title: { [Op.like]: `%${search}%` },
+      },
+      order: [["createdAt", order]],
+    });
+
+    const toughts = toughtsData.map((result) => {
+      const plainResult = result.get({ plain: true });
+      plainResult.createdAt = format(
+        new Date(plainResult.createdAt),
+        "dd/MM/yyyy"
+      );
+      return plainResult;
+    });
+
+    let toughtsQty = toughts.length;
+
+    if (toughtsQty === 0) {
+      toughtsQty = false;
+    }
+
+    res.render("toughts/home", { toughts, search, toughtsQty });
   }
 
   static async dashboard(req, res) {
@@ -13,7 +53,7 @@ module.exports = class ToughtsController {
         id: userId,
       },
       include: Tought,
-      plain: true
+      plain: true,
     });
 
     //check if user exists
@@ -21,9 +61,15 @@ module.exports = class ToughtsController {
       res.redirect("/login");
     }
 
-    const toughts = user.Toughts.map((result) => result.dataValues)
+    const toughts = user.Toughts.map((result) => result.dataValues);
 
-    res.render("toughts/dashboard", {toughts});
+    let emptyTought = false;
+
+    if (toughts.length === 0) {
+      emptyTought = true;
+    }
+
+    res.render("toughts/dashboard", { toughts, emptyTought });
   }
 
   static createTought(req, res) {
@@ -46,6 +92,48 @@ module.exports = class ToughtsController {
       });
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  static async removeTought(req, res) {
+    const id = req.body.id;
+    const UserId = req.session.userid;
+
+    req.flash("message", "Pensamento removido com sucesso!");
+
+    req.session.save(() => {
+      res.redirect("/toughts/dashboard");
+    });
+    try {
+      await Tought.destroy({ where: { id: id, UserId: UserId } });
+    } catch (err) {
+      console.log(`Ocorreu um erro: ${err}`);
+    }
+  }
+
+  static async updateTought(req, res) {
+    const id = req.params.id;
+
+    const tought = await Tought.findOne({ where: { id: id }, raw: true });
+
+    res.render("toughts/edit", { tought });
+  }
+
+  static async updateToughtSave(req, res) {
+    const id = req.body.id;
+    const tought = {
+      title: req.body.title,
+    };
+
+    try {
+      await Tought.update(tought, { where: { id: id } });
+      req.flash("message", "Pensamento atualizado com sucesso!");
+
+      req.session.save(() => {
+        res.redirect("/toughts/dashboard");
+      });
+    } catch (err) {
+      console.log(`Ocorreu um erro: ${err}`);
     }
   }
 };

@@ -161,6 +161,10 @@
     border-color: #fff;
     margin: 0 0.5em;
   }
+
+  .dashboard a {
+    color: #f6982d;
+  }
   
   /* CREATE / EDIT FORM */
   .tought-form-container a {
@@ -275,6 +279,11 @@
   
   .toughts-container span {
     color: #f6982d;
+  }
+
+  .author {
+    display: flex;
+    justify-content: space-between;
   }
   
   /* FOOTER */
