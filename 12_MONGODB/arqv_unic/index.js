@@ -1,5 +1,6 @@
 const express = require("express");
 const exphbs = require("express-handlebars");
+const handlebars = require('handlebars')
 
 const app = express();
 
@@ -12,6 +13,10 @@ app.set("view engine", "handlebars");
 
 // read body
 app.use(express.urlencoded({ extended: true }));
+
+handlebars.registerHelper('startsWith', function (str, prefix) {
+    return str.startsWith(prefix);
+  });
 
 app.use(express.json())
 
