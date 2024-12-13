@@ -3,13 +3,14 @@ import Pet from "../models/Pet.js";
 //helpers
 import getToken from "../helpers/get-token.js";
 import getUserByToken from "../helpers/get-user-by-token.js";
+import User from "../models/User.js";
 
 export default class PetController {
   //create a pet
   static async create(req, res) {
     const { name, age, weight, color } = req.body;
 
-    const images = req.files
+    const images = req.files;
 
     const avaliable = true;
 
@@ -33,9 +34,9 @@ export default class PetController {
       return;
     }
     if (images.length === 0) {
-        res.status(422).json({ message: "A imagem é obrigatória!" });
-        return;
-      }
+      res.status(422).json({ message: "A imagem é obrigatória!" });
+      return;
+    }
 
     // get pet owner
     const token = getToken(req);
@@ -58,8 +59,8 @@ export default class PetController {
     });
 
     images.map((image) => {
-        pet.images.push(image.filename);
-    })
+      pet.images.push(image.filename);
+    });
 
     try {
       const newPet = await pet.save();
@@ -70,5 +71,11 @@ export default class PetController {
     } catch (err) {
       res.status(500).json({ message: err });
     }
+  }
+  static async getAll(req, res) {
+    const pets = await Pet.find().sort("-createdAt");
+    res.status(200).json({
+      pets: pets,
+    });
   }
 }
