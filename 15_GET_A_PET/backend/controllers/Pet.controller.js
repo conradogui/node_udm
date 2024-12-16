@@ -1,9 +1,9 @@
 import Pet from "../models/Pet.js";
+import mongoose from "mongoose";
 
 //helpers
 import getToken from "../helpers/get-token.js";
 import getUserByToken from "../helpers/get-user-by-token.js";
-import User from "../models/User.js";
 
 export default class PetController {
   //create a pet
@@ -77,5 +77,81 @@ export default class PetController {
     res.status(200).json({
       pets: pets,
     });
+  }
+
+  static async getAllUserPets(req, res) {
+    //get user from token
+    const token = getToken(req);
+    const user = await getUserByToken(token);
+
+    const pets = await Pet.find({ "user._id": user._id }).sort("-createdAt");
+
+    res.status(200).json({
+      pets,
+    });
+  }
+
+  static async getAllUserAdoptions(req, res) {
+    //get user from token
+    const token = getToken(req);
+    const user = await getUserByToken(token);
+
+    const pets = await Pet.find({ "adopter._id": user._id }).sort("-createdAt");
+
+    res.status(200).json({
+      pets,
+    });
+  }
+
+  static async getPetById(req, res) {
+    const id = req.params.id;
+
+    //check if id is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(422).json({ message: "ID inválido" });
+      return;
+    }
+
+    //check if pet exists
+    const pet = await Pet.findOne({ _id: id });
+
+    if (!pet) {
+      res.status(404).json({ message: "Pet não encontrado" });
+    }
+
+    res.status(200).json({
+      pet: pet,
+    });
+  }
+
+  static async removePetById(req, res) {
+    const id = req.params.id;
+
+    //check if id is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(422).json({ message: "ID inválido" });
+      return;
+    }
+
+    //check if pet exists
+    const pet = await Pet.findOne({ _id: id });
+
+    if (!pet) {
+      res.status(404).json({ message: "Pet não encontrado" });
+    }
+
+    //check if logged in user registered the pet
+    const token = getToken(req);
+    const user = await getUserByToken(token);
+
+    if (pet.user._id.toString() !== user._id.toString()) {
+      res.status(422).json({
+        message:
+          "Houve um problema em processar a solicitação, tente novamente mais tarde!",
+      });
+    }
+
+    await Pet.findByIdAndDelete(id);
+    res.status(200).json({ message: "Pet removido com sucesso!" });
   }
 }
