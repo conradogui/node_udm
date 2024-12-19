@@ -9,7 +9,10 @@ import {
 /*Components */
 import Navbar from "./components/layout/Navbar.jsx";
 import Footer from "./components/layout/Footer.jsx";
-import Container from "./components/layout/Container.jsx"
+import Container from "./components/layout/Container.jsx";
+
+/*Context */
+import { UserProvider } from "./context/UserContext.jsx";
 
 /*Pages */
 import Home from "./components/pages/Home.jsx";
@@ -17,19 +20,23 @@ import Register from "./components/pages/Auth/Register.jsx";
 import Login from "./components/pages/Auth/Login.jsx";
 
 function App() {
-  return <>
-  <Router>
-    <Navbar/>
-    <Container>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/" element={<Home/>} />
-      </Routes>
-    </Container>
-    <Footer/>
-  </Router>
-  </>;
+  return (
+    <>
+      <Router>
+        <UserProvider>
+          <Navbar />
+          <Container>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/" element={<Home />} />
+            </Routes>
+          </Container>
+          <Footer />
+        </UserProvider>
+      </Router>
+    </>
+  );
 }
 
 export default App;

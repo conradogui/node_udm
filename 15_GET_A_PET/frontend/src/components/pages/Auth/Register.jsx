@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useState } from "react";
 
 import { Link } from "react-router-dom";
@@ -6,18 +6,21 @@ import { Link } from "react-router-dom";
 import Input from "../../form/Input.jsx";
 import style from "../../form/Form.module.css";
 
+/*Contexts */
+import { Context } from "../../../context/UserContext.jsx";
+
 const Register = () => {
   const [user, setUser] = useState({});
+  const { register } = useContext(Context);
 
   function handleChange(e) {
     setUser({ ...user, [e.target.name]: e.target.value });
   }
 
   function handleSubmit(e) {
-    e.preventDefault()
+    e.preventDefault();
     // enviar o usuario para o banco
-    console.log(user);
-    
+    register(user)
   }
 
   return (
