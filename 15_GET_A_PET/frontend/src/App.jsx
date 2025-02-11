@@ -10,6 +10,7 @@ import {
 import Navbar from "./components/layout/Navbar.jsx";
 import Footer from "./components/layout/Footer.jsx";
 import Container from "./components/layout/Container.jsx";
+import Message from "./components/layout/Message.jsx";
 
 /*Context */
 import { UserProvider } from "./context/UserContext.jsx";
@@ -25,6 +26,7 @@ function App() {
       <Router>
         <UserProvider>
           <Navbar />
+          <Message />
           <Container>
             <Routes>
               <Route path="/login" element={<Login />} />
