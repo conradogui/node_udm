@@ -20,6 +20,8 @@ import Home from "./components/pages/Home.jsx";
 import Register from "./components/pages/Auth/Register.jsx";
 import Login from "./components/pages/Auth/Login.jsx";
 import Profile from "./components/pages/User/Profile.jsx";
+import MyPets from "./components/pages/Pet/MyPets.jsx";
+import AddPet from "./components/pages/Pet/AddPet.jsx";
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/user/profile" element={<Profile />} />
+              <Route path="/pet/mypets" element={<MyPets />} />
+              <Route path="/pet/add" element={<AddPet />} />
               <Route path="/" element={<Home />} />
             </Routes>
           </Container>
