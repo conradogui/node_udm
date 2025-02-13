@@ -1,22 +1,34 @@
 import api from "../../../utils/api.jsx";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import styles from "./AddPet.module.css";
 
-/*Components */
 import PetForm from "../../form/PetForm.jsx";
 
 /*hooks */
 import useFlashMessage from "../../../hooks/useFlashMessage.jsx";
 
-const AddPet = () => {
+const EditPet = () => {
+  const [pet, setPet] = useState({});
   const [token] = useState(localStorage.getItem("token") || "");
+  const { id } = useParams();
   const { setFlashMessage } = useFlashMessage();
-  const navigate = useNavigate();
 
-  async function registerPet(pet) {
+  useEffect(() => {
+    api
+      .get(`/pets/${id}`, {
+        headers: {
+          Authorization: `Bearer ${JSON.parse(token)}`,
+        },
+      })
+      .then((response) => {
+        setPet(response.data.pet);
+      })
+      .catch((err) => {});
+  }, [token, id]);
+
+  async function updatePet(pet) {
     let msgType = "success";
-
     const formData = new FormData();
 
     await Object.keys(pet).forEach((key) => {
@@ -28,8 +40,9 @@ const AddPet = () => {
         formData.append(key, pet[key]);
       }
     });
+
     const data = await api
-      .post("pets/create", formData, {
+      .patch(`pets/${pet._id}`, formData, {
         headers: {
           Authorization: `Bearer ${JSON.parse(token)}`,
           "Content-Type": "multipart/form-data",
@@ -42,20 +55,21 @@ const AddPet = () => {
         msgType = "error";
         return err.response.data;
       });
+
     setFlashMessage(data.message, msgType);
-    if(msgType !== "error") {
-      navigate("/pets/mypets");
-    }
   }
+
   return (
-    <section className={styles.addpet_header}>
-      <div>
-        <h1>Cadastre um pet</h1>
-        <p>Depois ele ficará disponível para adoção</p>
+    <section>
+      <div className={styles.addpet_header}>
+        <h1>Editando o Pet: {pet.name}</h1>
+        <p>Depois da edição os dados serão atualizados no sistema</p>
       </div>
-      <PetForm handleSubmit={registerPet} btnText="Cadastrar Pet" />
+      {pet.name && (
+        <PetForm handleSubmit={updatePet} btnText="Atualizar" petData={pet} />
+      )}
     </section>
   );
 };
 
-export default AddPet;
+export default EditPet;

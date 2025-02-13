@@ -214,10 +214,7 @@ export default class PetController {
       updatedData.color = color;
     }
 
-    if (images.length === 0) {
-      res.status(422).json({ message: "A imagem é obrigatória!" });
-      return;
-    } else {
+    if (images.length > 0) {
       updatedData.images = [];
       images.map((image) => {
         updatedData.images.push(image.filename);
@@ -271,7 +268,7 @@ export default class PetController {
     await Pet.findByIdAndUpdate(id, pet);
 
     res.status(200).json({
-      mesage: `A visita foi agendada com secesso! Entre em contato com ${pet.user.name} pelo telefone ${pet.user.phone}`,
+      message: `A visita foi agendada com secesso! Entre em contato com ${pet.user.name} pelo telefone ${pet.user.phone}`,
     });
   }
 
