@@ -11,6 +11,7 @@ const Select = ({ text, name, options, handleOnChange, value }) => {
         value={value || ""}
       >
         <option>Selecione uma opção</option>
+        /**Aqui sao as options */
         {options.map((option) => (
           <option value={option} key={option}>
             {option}
